@@ -1,0 +1,87 @@
+--- 
+
+- name: Create guest directory
+  file:
+    dest: "{{ guest_path }}/{{ guest_name }}"
+    state: directory
+
+- name: Create guest QEMU image file
+  qemu_img:
+    dest: "{{ guest_path }}/{{ guest_name }}/{{ guest_name }}.qcow2"
+    size: "{{ guest_img_size }}"
+    format: qcow2
+
+- name: Generate guest UUID
+  shell: "uuidgen -t"
+  register: guest_uuid
+
+- name: Generate guest MAC addresses
+  shell: "openssl rand 3 | xxd -p | sed 's/\\(..\\)/\\1:/g; s/:$//'"
+  with_sequence: count=2
+  register: guest_mac_list
+
+- name: Copy guest XML template
+  template:
+    src: guest.xml.j2
+    dest: "{{ guest_path }}/{{ guest_name }}/{{ guest_name }}.xml"
+
+- name: Create guest VM
+  virt_guest:
+    guest: "{{ guest_name }}"
+    src: "{{ guest_path }}/{{ guest_name }}/{{ guest_name }}.xml"
+
+- name: Create guest Kickstart directory
+  file:
+    dest: "{{ guest_path }}/{{ guest_name }}/ks"
+    state: directory
+
+- name: Copy guest Kickstart configuration
+  template:
+    src: kickstart.cfg.j2
+    dest: "{{ guest_path }}/{{ guest_name }}/ks/{{ guest_name }}.cfg"
+
+- name: Create guest ISOLINUX directory
+  file:
+    dest: "{{ guest_path }}/{{ guest_name }}/isolinux"
+    state: directory
+
+- name: Download guest Kernel and initrd
+  get_url:
+    url: "{{ mirror_url }}//isolinux/{{ item }}"
+    dest: "{{ guest_path }}/{{ guest_name }}/isolinux/{{ item }}"
+  with_items:
+  - vmlinuz
+  - initrd.img
+
+- name: Copy Kickstart server unit file
+  become: yes
+  template:
+    src: kickstart-httpd.service.j2
+    dest: "/etc/systemd/system/kickstart-httpd.service"
+  register: kickstart
+
+- name: Start Kickstart server
+  become: yes
+  systemd:
+    name: kickstart-httpd.service
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+
+- name: Boot guest VM from Kickstart
+  virt_boot:
+    domain: "{{ guest_name }}"
+    kernel: "{{ guest_path }}/{{ guest_name }}/isolinux/vmlinuz"
+    initrd: "{{ guest_path }}/{{ guest_name }}/isolinux/initrd.img"
+    cmdline: "linux ksdevice=link ks=http://{{ ansible_default_ipv4.address }}:{{ ks_tcp_port }}/{{ guest_name }}.cfg"
+
+- name: Get guest VM PID
+  shell: "ps -C \"qemu-system-x86_64 -name guest={{ guest_name }}\" -o pid= | awk '{print $1}'"
+  register: pid
+
+- name: Wait for guest installation to finish
+  wait_for:
+    path: "/proc/{{ pid.stdout }}/status"
+    state: absent
+  notify: "Stop kickstart server"
+

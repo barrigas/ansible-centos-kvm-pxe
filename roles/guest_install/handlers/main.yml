@@ -1,0 +1,9 @@
+---
+
+- name: Stop kickstart server
+  become: yes
+  systemd:
+    name: kickstart-httpd.service
+    state: stopped
+    enabled: no
+

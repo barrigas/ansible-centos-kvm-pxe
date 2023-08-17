@@ -1,0 +1,88 @@
+# Kickstart
+#version=CENTOS{{ centos_ver }}
+
+# System language
+lang {{ guest_lang }}
+
+# Keyboard configuration
+keyboard {{ guest_keyboard }}
+
+# System timezone
+timezone --utc {{ guest_timezone }}
+
+# Network information
+network --bootproto=static --hostname={{ guest_name }} --ip={{ guest_ip }} --netmask={{ guest_mask }} --gateway={{ guest_gw }} --nameserver={{ guest_gw }} --onboot=yes --activate
+
+# Authentication configuration 
+authconfig --enableshadow --passalgo=sha512
+
+# Unsupported hardware handling
+unsupported_hardware
+
+# Root password
+rootpw --iscrypted {{ guest_root_pwd }}
+
+# Enable SSH service
+services --enabled=sshd
+
+# SELinux configuration
+selinux --enforcing
+
+# Disable firstboot
+firstboot --disable
+
+# Custom text block
+text
+
+# Skip X Window System configuration
+skipx
+
+# Power off the system after installation
+poweroff
+
+# Partitioning
+zerombr
+bootloader --location=mbr --driveorder={{ virtio_block_device }}
+clearpart --all --initlabel --drives={{ virtio_block_device }}
+
+part /boot     --fstype=ext4     --ondisk={{ virtio_block_device }} --label boot     --size={{ guest_part_boot }}     --fsoption=noatime
+part /boot/efi --fstype=vfat     --ondisk={{ virtio_block_device }} --label efi_boot --size={{ guest_part_boot_efi }}
+part pv.1      --fstype='lvmpv'  --ondisk={{ virtio_block_device }} --label root     --size 1                         --grow
+
+volgroup vg_{{ guest_name }}_root --pesize=4096 pv.1
+
+logvol swap           --fstype=swap --name=lv_swap           --vgname=vg_{{ guest_name }}_root --size={{ guest_part_swap }}
+logvol /              --fstype=ext4 --name=lv_root           --vgname=vg_{{ guest_name }}_root --size={{ guest_part_root }} --fsoptions=noatime
+logvol /home          --fstype=ext4 --name=lv_home           --vgname=vg_{{ guest_name }}_root --size={{ guest_part_home }}
+logvol /usr           --fstype=ext4 --name=lv_usr            --vgname=vg_{{ guest_name }}_root --size={{ guest_part_usr }}
+logvol /var           --fstype=ext4 --name=lv_var            --vgname=vg_{{ guest_name }}_root --size={{ guest_part_var }}
+logvol /var/log       --fstype=ext4 --name=lv_var_log        --vgname=vg_{{ guest_name }}_root --size={{ guest_part_var_log }}
+logvol /var/log/audit --fstype=ext4 --name=lv_var_log_audit  --vgname=vg_{{ guest_name }}_root --size={{ guest_part_var_log_audit }}
+logvol /tmp           --fstype=ext4 --name=lv_tmp            --vgname=vg_{{ guest_name }}_root --size={{ guest_part_tmp }}
+logvol /opt           --fstype=ext4 --name=lv_opt            --vgname=vg_{{ guest_name }}_root --size={{ guest_part_opt }}
+
+# Installation source
+url --url={{ mirror_url }}
+
+# Repositories
+repo --name=optional --baseurl={{ mirror_url }}
+
+# Packages to install
+%packages --ignoremissing --excludedocs
+@core --nodefaults
+-iwl*
+-aic*
+-alsa*
+-ivtv*
+-NetworkManager*
+-kexec-tools
+-postfix
+-openldap
+-plymouth
+-autofs
+-biosdevname
+-virt-what
+-iprutils
++lvm*
+%end
+

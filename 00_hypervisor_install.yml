@@ -1,0 +1,7 @@
+---
+
+- hosts: centos6
+  become: true
+  roles:
+   - hypervisor_install
+

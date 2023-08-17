@@ -1,0 +1,32 @@
+---
+
+- name: Gather dependency packages
+  set_fact:
+    dep_packages:
+      - qemu-system-x86
+      - libvirt-daemon-system
+      - libvirt-clients
+      - virtinst
+      - virt-manager
+      - libguestfs-tools
+      - bridge-utils
+      - cpu-checker
+
+- name: Install dependency packages
+  apt:
+    name: "{{ dep_packages }}"
+    state: latest
+    update_cache: true
+  register: result
+  until: result is successful
+
+- name: Set libvirtd permissions
+  lineinfile:
+    dest: /etc/libvirt/libvirtd.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^auth_unix_ro', line: 'auth_unix_ro = "none"' }
+    - { regexp: '^auth_unix_rw', line: 'auth_unix_rw = "none"' }
+  notify: Restart libvirtd
+

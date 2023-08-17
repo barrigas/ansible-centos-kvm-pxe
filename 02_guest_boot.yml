@@ -1,0 +1,8 @@
+---
+
+- hosts: centos6
+  vars:
+    guest_name: guest-4
+  roles:
+   - guest_boot
+

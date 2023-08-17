@@ -1,0 +1,5 @@
+[centos6]
+localhost
+
+[centos6:vars]
+ansible_connection=local

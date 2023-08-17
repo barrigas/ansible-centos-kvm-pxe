@@ -1,0 +1,11 @@
+---
+
+- hosts: centos6
+  vars:
+    guest_name: guest-4
+    guest_ram: 7812500
+    guest_cpus: 4
+    guest_ip: 192.168.122.15
+  roles:
+   - guest_install
+

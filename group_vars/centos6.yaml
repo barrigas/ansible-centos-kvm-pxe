@@ -1,0 +1,50 @@
+# Overwrite these on the playbook
+guest_name: guest-1
+guest_ram: 1048576
+guest_cpus: 1
+
+# Guest path
+guest_path: "{{ ansible_env.HOME }}.hypervisor/kvm"
+
+# Partition layout (gpt or mbr/mbr-xfs)
+disk_layout: mbr
+
+# Block device (vda or sda)
+virtio_block_device: vda
+
+# QEMU image size
+guest_img_size: 76040 # 76032+8
+
+# Partition size
+guest_part_boot_efi: 256
+guest_part_boot: 512
+guest_part_swap: 1024
+guest_part_root: 1024
+guest_part_home: 12288
+guest_part_usr: 24576
+guest_part_var: 12288
+guest_part_var_log: 12288
+guest_part_var_log_audit: 8192
+guest_part_tmp: 2048
+guest_part_opt: 1024
+
+# CentOS version & repository
+centos_ver: 6.9
+mirror_url: https://vault.centos.org/{{ centos_ver }}/os/x86_64
+
+# Kickstart server TCP port
+ks_tcp_port: 8000
+
+# Guest networking
+guest_ip: 192.168.122.10
+guest_mask: 255.255.255.0
+guest_gw: 192.168.122.1
+
+# Guest language & timezone
+guest_lang: en_US.UTF-8
+guest_keyboard: pt-latin1
+guest_timezone: Europe/Lisbon
+
+# Guest root user password (password: root)
+guest_root_pwd: "$6$qAHFtGQktozWksrq$u4TUb0Khi/m7wqdToRtc/WKnxVOsY467KCWoXbcNwbOlXvyS0JnXdpLB2R2AUP6IrfFGxFCxQOSKWfjWWCKzJ0"
+

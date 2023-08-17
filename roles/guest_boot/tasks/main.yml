@@ -1,0 +1,21 @@
+--- 
+
+- name: Boot guest VM from disk
+  virt_boot:
+    guest: "{{ guest_name }}"
+    boot: "hd"
+
+# TODO
+#
+#- name: Wait for SSH port to be available
+#  wait_for:
+#    host: "{{ guest_ip }}"
+#    port: 22
+#    state: started
+#    delay: 5
+#    timeout: 300
+
+- name: Display post install message
+  debug:
+    msg: "{{ guest_name }} is ready!"
+
