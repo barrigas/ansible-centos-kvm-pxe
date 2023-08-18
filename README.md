@@ -2,7 +2,9 @@
 
 Create a hypervisor with KVM, QEMU, and libvirt & deploy CentOS guests with PXE and Kickstart.
 
-> This is an old project that has been rescued and tailored for CentOS 6 deployments, using the latest Python and Ansible versions. Keep in mind that CentOS 6 reached EOL in 2020, and its content at http://mirror.centos.org/centos-6/ has been taken down. In the future I may extend this for newer CentOS versions.
+> This is an old project that has been rescued and tailored for CentOS 6 deployments, using the latest Python and Ansible versions. Keep in mind that CentOS 6 reached EOL in 2020, and its content at http://mirror.centos.org/centos-6/ has been taken down.
+> 
+> In the future I may extend this for newer CentOS versions.
 
 ## Usage
 
