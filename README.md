@@ -17,11 +17,11 @@ $ ansible-playbook 00_hypervisor_install.yml -i inventory
 <details>
     <summary>Dependency package details</summary>
 
-* qemu-kvm – Provides hardware emulation.
+* qemu-kvm – Hardware emulation.
 * libvirt-daemon-system – Configuration files required to run the libvirt daemon.
 * libvirt-clients – Client-side libraries and APIs for managing and controlling virtual machines & hypervisors from the command line.
-* virtinst – A  set of command-line utilities for provisioning and modifying virtual machines.
-* virt-manager – A Qt-based graphical interface for managing virtual machines via the libvirt daemon.
+* virtinst – A set of command-line utilities for provisioning and modifying virtual machines.
+* virt-manager – A Qt-based graphical interface for managing virtual machines.
 * bridge-utils – A set of tools for creating and managing bridge devices.
 * cpu-checker – To check whether your system is cabable of of running hardware accelerated KVM virtual machines (run ```kvm-ok``` from the cmd)
 </details>
@@ -48,7 +48,7 @@ Update the ```guest_name``` variable in ```02_guest_boot.yml``` to match the gue
 $ ansible-playbook 02_guest_boot.yml -i inventoy
 ```
 
-You can now start an SSH session into the newly create guest. Alternitevely, you can access the guest shell with Virtual Machine Manager (VMM).
+You can now start an SSH session into the newly created guest. Alternatively, you can access the guest shell with Virtual Machine Manager (VMM).
 
 ## Compatibility
 
