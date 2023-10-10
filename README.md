@@ -1,42 +1,29 @@
-# Provision a CentOS VM on KVM
+# ansible-centos-kvm-pxe
 
-Create a hypervisor with KVM, QEMU, and libvirt & deploy CentOS guests with PXE and Kickstart.
+Ansible roles to deploy CentOS KVM guests with Kickstart & HTTP boot server for PXE.
 
-This creates a local HTTP server running on port 8000 (by default) serving Kickstart files for automated CentOS installation.
-
-> This is an old project that has been rescued and tailored for CentOS 6 deployments, using the latest Python and Ansible versions. Keep in mind that CentOS 6 reached EOL in 2020, and the content at http://mirror.centos.org/centos-6/ has been taken down.
-> 
-> In the future I may extend this for newer CentOS versions.
+> This project is tailored for CentOS 6 deployments. Keep in mind that CentOS 6 reached EOL in 2020, and the content at http://mirror.centos.org/centos-6/ has been taken down.
 
 ## Usage
 
 #### 1. Install dependencies.
- 
+
+Ensure you have QEMU and Libvirt installed.
+
 ```
 $ ansible-playbook 00_hypervisor_install.yml -i inventory
 ```
-
-<details>
-    <summary>Dependency package details</summary>
-
-* qemu-kvm – Hardware emulation.
-* libvirt-daemon-system – Configuration files required to run the libvirt daemon.
-* libvirt-clients – Client-side libraries and APIs for managing and controlling virtual machines & hypervisors from the command line.
-* virtinst – A set of command-line utilities for provisioning and modifying virtual machines.
-* virt-manager – A Qt-based graphical interface for managing virtual machines.
-* bridge-utils – A set of tools for creating and managing bridge devices.
-* cpu-checker – To check whether your system is cabable of of running hardware accelerated KVM virtual machines (run ```kvm-ok``` from the cmd)
-</details>
+Check the role task for the full package dependency list.
 
 #### 2. Install CentOS on the VM.
 
-Update ```group_vars``` variables, or overwrite these on the ```01_guest_install.yml``` playbook before running it.
+Update ```group_vars``` variables to set the OS specs before running the ```01_guest_install.yml``` playbook. Alternetively, overwrite these on the playbook itself.
 
 ```
 $ ansible-playbook 01_guest_install.yml -i inventory
 ```
 
-The root user password is currently set to ```root``` (same as the user name). Feel free to generate a new hash with the command below, and update the ```guest_root_pwd``` variable.
+The OS root user password is currently set to ```root``` (same as the username). Feel free to generate a new hash with the command below, and update the ```guest_root_pwd``` variable accordingly.
 
 ```
 $ python3 -c 'import crypt; print(crypt.crypt("test", crypt.mksalt(crypt.METHOD_SHA512)))'
@@ -44,13 +31,15 @@ $ python3 -c 'import crypt; print(crypt.crypt("test", crypt.mksalt(crypt.METHOD_
 
 #### 3. Start the guest VM.
 
-Update the ```guest_name``` variable in ```02_guest_boot.yml``` to match the guest host to start, and run the playbook.
+Ensure that the ```guest_name``` variable in ```02_guest_boot.yml``` matches the guest host name installed in the previous step, and run the playbook.
 
 ```
 $ ansible-playbook 02_guest_boot.yml -i inventoy
 ```
 
-You can now start an SSH session into the newly created guest. Alternatively, you can access the guest shell with Virtual Machine Manager (VMM).
+You can now start an SSH session into the deployed host using the IP address set in the ```guest_ip``` variable.
+
+Alternetively, you can access the guest shell with Virtual Machine Manager (VMM).
 
 ## Compatibility
 
