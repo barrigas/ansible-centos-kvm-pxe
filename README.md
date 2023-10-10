@@ -37,7 +37,7 @@ Ensure that the ```guest_name``` variable in ```02_guest_boot.yml``` matches the
 $ ansible-playbook 02_guest_boot.yml -i inventoy
 ```
 
-You can now start an SSH session into the deployed host using the IP address set in the ```guest_ip``` variable.
+Once booted, you can now start an SSH session into the deployed host using the IP address set in the ```guest_ip``` variable.
 
 Alternetively, you can access the guest shell with Virtual Machine Manager (VMM).
 
